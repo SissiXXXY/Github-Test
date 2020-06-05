@@ -4,27 +4,28 @@ import time
 primeList = []
 
 
-def notdivbefore(current):
-    if primeList:
-        for b in primeList:
-            if current % b == 0:
-                return False
+def is_prime(num):
+    threshold = int(math.sqrt(num))
+    for b in primeList:
+        if num % b == 0:
+            return False
+        if b > threshold:
+            break
 
-        return True
-
-    else:
-        return True
+    return True
 
 
 def getprime():
     primeList.append(2)
-    for num in range(2, 100000):
-        for k in range(2, int(math.sqrt(k))):
-            if notdivbefore(num):
-                primeList.append(num)
+    print(primeList)
+    for num in range(3, 100000):
+        if is_prime(num):
+            primeList.append(num)
+            print(num)
 
 
 start = time.time()
 getprime()
+print(sum(primeList))
 end = time.time()
 print(str(end - start))
