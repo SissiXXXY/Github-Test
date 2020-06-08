@@ -4,7 +4,6 @@ Find the largest palindrome made from the product of two 3-digit numbers."""
 product = []
 palindrome = []
 
-
 def get_product():
     for k in range(10, 100):
         for m in range(10, 100):
@@ -13,7 +12,7 @@ def get_product():
 
 def is_palindrome(num):
     tostr = str(num)
-    if tostr[0:] == tostr[-1:]:
+    if tostr[0:] == tostr[-1::-1]:
         return True
     else:
         return False
