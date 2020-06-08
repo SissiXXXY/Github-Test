@@ -5,25 +5,22 @@ public class primeNum {
 	public primeNum(){
 		primeList= new ArrayList<Integer>();
 	}
-	public static boolean notDivBefore(int current) {
-		if(primeList!=null) {
+	public static boolean isPrime(int current) {
 			for(int b:primeList) {
 				if(current%b==0) {
 					return false;
 				}
+				if(b>Math.sqrt(current)) {
+					break;
+				}
 			}
 			return true;
 		}
-		else {
-			return true;
-		}
 		
-	}
 	public static void getPrime() {
 		primeList.add(2);
 		for(int num=2;num<=100000;num++) {
-			for(int k=2;k<=Math.sqrt(num);k++) {
-				if(notDivBefore(num)) {
+				if(isPrime(num)) {
 					//System.out.println("once");
 					//System.out.println("here111");
 					//System.out.println(num);
@@ -33,7 +30,7 @@ public class primeNum {
 			}
 		}
 		
-	}
+	
 	public static void main(String[] args) {
 		primeNum prime=new primeNum();
 		long start=System.currentTimeMillis();
