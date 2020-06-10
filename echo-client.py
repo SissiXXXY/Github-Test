@@ -5,8 +5,11 @@ PORT = 65432
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
-    user_input = input()
-    s.sendall(bytes(user_input, encoding='utf-8'))
-    data = s.recv(1024)
-
-print('received', repr(data))
+    while True:
+        user_input = input()
+        if user_input != 'finish':
+            s.sendall(user_input.encode('utf-8'))
+        else:
+            break
+        data = s.recv(1024)
+        print('received', data.decode("utf-8"))

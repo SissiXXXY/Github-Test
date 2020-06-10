@@ -13,4 +13,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             data = conn.recv(1024)
             if not data:
                 break
-            conn.sendall(data)
+            print(data.decode("utf-8"))
+            response = input()
+            conn.sendall(response.encode("utf-8"))
