@@ -5,8 +5,8 @@ product = []
 palindrome = []
 
 def get_product():
-    for k in range(10, 100):
-        for m in range(10, 100):
+    for k in range(100, 1000):
+        for m in range(100, 1000):
             product.append(k * m)
 
 
@@ -22,10 +22,9 @@ get_product()
 print(product)
 print(str(121))
 print('forward ' + str(121)[0:])
-print('backward ' + str(121)[-1:])
+print('backward ' + str(121)[-1::-1])
 
 for p in product:
-    print(is_palindrome(p))
     if is_palindrome(p):
         palindrome.append(p)
 
