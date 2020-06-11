@@ -23,15 +23,20 @@ def producer(id: str):
 def consumer(id: str):
     event.wait()
     while True:
-        lock.acquire()
+
         print(f"consumer {id} started")
         if not t:
             event.clear()
             break
+        lock.acquire()
         last = t[-1]
-        print(f"the last is {last}, minus one is {last - 1}")
         del t[-1]
         lock.release()
+        work(last)
+
+
+def work(last):
+    print(f"the last is {last}, minus one is {last - 1}")
 
 
 if __name__ == '__main__':
