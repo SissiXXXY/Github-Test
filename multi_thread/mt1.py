@@ -9,24 +9,25 @@ event = threading.Event()
 
 
 def producer(id: str):
-    lock.acquire()
     print(f"producer {id} started")
     for i in range(10000):
+        lock.acquire()
         a = random.randint(1, 500)
         b = random.randint(1, 500)
         print(f"num a = {a}, num b = {b}, sum = {a + b}")
         t.append(a + b)
+        lock.release()
     event.set()
-    lock.release()
 
 
 def consumer(id: str):
     event.wait()
-    lock.acquire()
     while True:
+        lock.acquire()
         print(f"consumer {id} started")
         if not t:
             event.clear()
+            break
         last = t[-1]
         print(f"the last is {last}, minus one is {last - 1}")
         del t[-1]
