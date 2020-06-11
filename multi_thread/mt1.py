@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import threading
+import time
 from threading import Thread
 import random
 
 t = []
 lock = threading.Lock()
-event = threading.Event()
 
 
 def producer(id: str):
@@ -17,22 +17,24 @@ def producer(id: str):
         print(f"num a = {a}, num b = {b}, sum = {a + b}")
         t.append(a + b)
         lock.release()
-    event.set()
 
 
 def consumer(id: str):
-    event.wait()
     while True:
-
         print(f"consumer {id} started")
-        if not t:
-            event.clear()
-            break
+
+        has_data = False
+        x = 0
+
         lock.acquire()
-        last = t[-1]
-        del t[-1]
+        if len(t) > 0:
+            has_data = True
+            x = t[-1]
+            del t[-1]
         lock.release()
-        work(last)
+
+        if has_data:
+            work(x)
 
 
 def work(last):
@@ -47,6 +49,7 @@ if __name__ == '__main__':
         """consumer_thread.join()"""
 
     # start producers
+    time.sleep(1)
     for i in range(2):
         producer_thread = Thread(target=producer, args=(f"P{i + 1}",))
         producer_thread.start()
