@@ -40,11 +40,11 @@ def consumer(id: str):
             if remaining <= 0:
                 event.clear()
         lock.release()
-        if not event.isSet():
-            event.wait()
-
         if has_data:
             work(id, x, remaining)
+        event.wait()
+
+
 
 
 def work(id, cus, remaining):
