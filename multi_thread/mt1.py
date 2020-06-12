@@ -6,51 +6,61 @@ import random
 
 t = []
 lock = threading.Lock()
+event = threading.Event()
+num = 0
 
 
 def producer(id: str):
+    global num
     print(f"producer {id} started")
-    for i in range(10000):
+    while True:
         lock.acquire()
-        a = random.randint(1, 500)
-        b = random.randint(1, 500)
-        print(f"num a = {a}, num b = {b}, sum = {a + b}")
-        t.append(a + b)
+        num = num + 1
+        print(f"producer {id} appending {num} into list")
+        t.append(num)
+        event.set()
         lock.release()
+        time.sleep(random.random())
 
 
 def consumer(id: str):
+    print(f"consumer {id} started")
     while True:
-        print(f"consumer {id} started")
-
+        print(f"consumer {id} ready to get next data")
         has_data = False
         x = 0
+        remaining = 0
 
         lock.acquire()
         if len(t) > 0:
             has_data = True
-            x = t[-1]
-            del t[-1]
+            x = t[0]
+            del t[0]
+            remaining = len(t)
+            if remaining <= 0:
+                event.clear()
         lock.release()
+        if not event.isSet():
+            event.wait()
 
         if has_data:
-            work(x)
+            work(id, x, remaining)
 
 
-def work(last):
-    print(f"the last is {last}, minus one is {last - 1}")
+def work(id, cus, remaining):
+    print(f"consumer {id} now serving customer: {cus}, {remaining} in queue")
+    time.sleep(random.random() * 3)
 
 
 if __name__ == '__main__':
     # start consumers
-    for i in range(3):
+    for i in range(15):
         consumer_thread = Thread(target=consumer, args=(f"C{i + 1}",))
         consumer_thread.start()
         """consumer_thread.join()"""
 
     # start producers
-    time.sleep(1)
-    for i in range(2):
+    for i in range(5):
         producer_thread = Thread(target=producer, args=(f"P{i + 1}",))
         producer_thread.start()
         """producer_thread.join()"""
