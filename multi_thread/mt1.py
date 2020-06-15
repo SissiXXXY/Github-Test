@@ -46,11 +46,11 @@ def consumer(id: str):
         print(f"consumer {id} ready to get next data")
         # call pop
         x = example.pop()
-        work(id, x)
+        work(id, x.number, x.type)
 
 
-def work(id, customer):
-    print(f"consumer {id} now serving customer number: {customer.number}, type: {customer.type}")
+def work(id, customer, type):
+    print(f"consumer {id} now serving customer number: {customer}, type: {type}")
     time.sleep(random.random() * 3)
 
 
