@@ -32,8 +32,8 @@ def work(id, cus):
 
 
 class SimpleQueue:
-    def __init__(self, t: list):
-        self.t = t
+    def __init__(self):
+        self.t = []
         self.lock = threading.Lock()
         self.event = threading.Event()
 
@@ -44,33 +44,30 @@ class SimpleQueue:
         self.event.set()
         self.lock.release()
 
-    def has_data(self):
-        if len(self.t) > 0:
-            return True
-        else:
-            return False
+    def count(self):
+        return len(self.t)
 
     def pop(self):
-        self.event.wait()
-        self.lock.acquire()
-        x = 0
-        remaining = 0
-        if self.has_data():
-            x = self.t[0]
-            del self.t[0]
-            remaining = len(self.t)
-            if remaining <= 0:
-                self.event.clear()
+        while True:
+            self.event.wait()
+            self.lock.acquire()
+            x = 0
+            remaining = 0
+            if self.count() > 0:
+                x = self.t[0]
+                del self.t[0]
+                remaining = len(self.t)
+                if remaining <= 0:
+                    self.event.clear()
+                self.lock.release()
+                print(x)
+                return x
+                # self.lock.release()
             self.lock.release()
-            print(x)
-            return x
-            # self.lock.release()
-        self.lock.release()
 
 
 if __name__ == '__main__':
-    exli = []
-    example = SimpleQueue(exli)
+    example = SimpleQueue()
 
     # start consumers
     for i in range(15):
