@@ -61,6 +61,7 @@ class SimpleQueue:
             remaining = len(self.t)
             if remaining <= 0:
                 self.event.clear()
+            self.lock.release()
             print(x)
             return x
             # self.lock.release()
