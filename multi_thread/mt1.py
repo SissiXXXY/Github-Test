@@ -38,22 +38,23 @@ class SimpleQueue:
         self.event = threading.Event()
 
     def push(self, content):
-        self.lock.acquire()
-        print(f"producer {id} appending {content} into list")
-        self.t.append(content)
-        self.event.set()
-        self.lock.release()
+        with self.lock:
+            print(f"producer {id} appending {content} into list")
+            self.t.append(content)
+            self.event.set()
 
     def count(self):
+        with self.lock:
+            return self.__count()
+
+    def __count(self):
         return len(self.t)
 
     def pop(self):
         while True:
             self.event.wait()
             with self.lock:
-                x = 0
-                remaining = 0
-                if self.count() > 0:
+                if self.__count() > 0:
                     x = self.t[0]
                     del self.t[0]
                     remaining = len(self.t)
