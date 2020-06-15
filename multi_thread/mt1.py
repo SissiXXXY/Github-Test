@@ -11,27 +11,33 @@ def producer(id: str):
     while True:
         produce()
         producevip()
-        time.sleep(random.random())
+        #time.sleep(random.random())
 
 
 def produce():
+    lock=threading.Lock()
     localtime = time.localtime(time.time())
     ran_str = ''.join(random.sample(string.ascii_letters, 4))
     num = 10000
-    common = Customer(num, ran_str, 'common', localtime)
-    example.push(common)
-    num = num + 1
-    time.sleep(random.random())
+    while True:
+        common = Customer(num, ran_str, 'common', localtime)
+        with lock:
+            example.push(common)
+        num = num + 1
+        time.sleep(random.random())
 
 
 def producevip():
+    lock = threading.Lock()
     localtime = time.localtime(time.time())
     ran_str = ''.join(random.sample(string.ascii_letters, 4))
     numvip = 999000
-    vip = Customer(numvip, ran_str, 'vip', localtime)
-    example.push(vip)
-    numvip = numvip + 1
-    time.sleep(random.random() * 2)
+    while True:
+        vip = Customer(numvip, ran_str, 'vip', localtime)
+        with lock:
+            example.push(vip)
+        numvip = numvip + 1
+        time.sleep(random.random() * 2)
 
 
 def consumer(id: str):
