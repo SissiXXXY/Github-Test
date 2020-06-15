@@ -50,20 +50,17 @@ class SimpleQueue:
     def pop(self):
         while True:
             self.event.wait()
-            self.lock.acquire()
-            x = 0
-            remaining = 0
-            if self.count() > 0:
-                x = self.t[0]
-                del self.t[0]
-                remaining = len(self.t)
-                if remaining <= 0:
-                    self.event.clear()
-                self.lock.release()
-                print(x)
-                return x
-                # self.lock.release()
-            self.lock.release()
+            with self.lock:
+                x = 0
+                remaining = 0
+                if self.count() > 0:
+                    x = self.t[0]
+                    del self.t[0]
+                    remaining = len(self.t)
+                    if remaining <= 0:
+                        self.event.clear()
+                    print(x)
+                    return x
 
 
 if __name__ == '__main__':
