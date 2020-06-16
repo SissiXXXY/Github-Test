@@ -10,34 +10,18 @@ def producer(id: str):
     print(f"producer {id} started")
     while True:
         produce()
-        producevip()
-        #time.sleep(random.random())
+        # time.sleep(random.random())
 
 
 def produce():
-    lock=threading.Lock()
     localtime = time.localtime(time.time())
     ran_str = ''.join(random.sample(string.ascii_letters, 4))
     num = 10000
     while True:
         common = Customer(num, ran_str, 'common', localtime)
-        with lock:
-            example.push(common)
+        example.push(common)
         num = num + 1
         time.sleep(random.random())
-
-
-def producevip():
-    lock = threading.Lock()
-    localtime = time.localtime(time.time())
-    ran_str = ''.join(random.sample(string.ascii_letters, 4))
-    numvip = 999000
-    while True:
-        vip = Customer(numvip, ran_str, 'vip', localtime)
-        with lock:
-            example.push(vip)
-        numvip = numvip + 1
-        time.sleep(random.random() * 2)
 
 
 def consumer(id: str):
@@ -65,6 +49,7 @@ class Customer:
 
 class SimpleQueue:
     def __init__(self):
+        self.priority = []
         self.t = []
         self.lock = threading.Lock()
         self.event = threading.Event()
@@ -73,6 +58,7 @@ class SimpleQueue:
         with self.lock:
             print(f"producer {id} appending {content} into list")
             self.t.append(content)
+            self.priority.append(content.number)
             self.event.set()
 
     def count(self):
@@ -95,10 +81,22 @@ class SimpleQueue:
                     print(x)
                     return x
 
+    def poppri(self):
+        with self.lock:
+            if self.__count() > 0:
+                # the least num shows the highest priority
+                fir = min(self.priority)
+                x = self.t[fir]
+                del self.t[fir]
+                remaining = len(self.t)
+                if remaining <= 0:
+                    self.event.clear()
+                print(x)
+                return x
+
 
 if __name__ == '__main__':
     example = SimpleQueue()
-
     # start consumers
     for i in range(2):
         consumer_thread = Thread(target=consumer, args=(f"C{i + 1}",))
