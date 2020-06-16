@@ -16,11 +16,10 @@ def producer(id: str):
 def produce():
     localtime = time.localtime(time.time())
     ran_str = ''.join(random.sample(string.ascii_letters, 4))
-    num = 10000
     while True:
+        num = random.randint(1, 10000)
         common = Customer(num, ran_str, 'common', localtime)
         example.push(common)
-        num = num + 1
         time.sleep(random.random())
 
 
@@ -29,7 +28,7 @@ def consumer(id: str):
     while True:
         print(f"consumer {id} ready to get next data")
         # call pop
-        x = example.pop()
+        x = example.poppri()
         work(id, x.number, x.type)
 
 
@@ -56,7 +55,7 @@ class SimpleQueue:
 
     def push(self, content):
         with self.lock:
-            print(f"producer {id} appending {content} into list")
+            print(f"producer {id} appending {content.number} into list")
             self.t.append(content)
             self.priority.append(content.number)
             self.event.set()
@@ -82,17 +81,19 @@ class SimpleQueue:
                     return x
 
     def poppri(self):
-        with self.lock:
-            if self.__count() > 0:
-                # the least num shows the highest priority
-                fir = min(self.priority)
-                x = self.t[fir]
-                del self.t[fir]
-                remaining = len(self.t)
-                if remaining <= 0:
-                    self.event.clear()
-                print(x)
-                return x
+        while True:
+            self.event.wait()
+            with self.lock:
+                if self.__count() > 0:
+                    # the least num shows the highest priority
+                    fir = min(self.priority)
+                    x = self.t[fir]
+                    del self.t[fir]
+                    remaining = len(self.t)
+                    if remaining <= 0:
+                        self.event.clear()
+                    print(x)
+                    return x
 
 
 if __name__ == '__main__':
