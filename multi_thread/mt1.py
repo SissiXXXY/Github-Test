@@ -75,9 +75,12 @@ class SimpleQueue:
     def __count(self):
         return len(self.t)"""
 
-    def pop(self):
+    def pop(self, timeout_sec=None):
         while True:
-            self.event.wait(1)
+            is_set = self.event.wait(timeout_sec)
+            if not is_set:
+                raise TimeoutError()
+
             with self.lock:
                 if len(self.t) > 0:
                     return heapq.heappop(self.t)
@@ -102,7 +105,7 @@ class SimpleQueue:
 
 def producer_func(id: str):
     print(f"producer {id} started")
-    for i in range(10):
+    while in_working_hours:
         c: Customer = produce()
         print(f"producer {id} appending {c} into list")
         global_queue.push(c)
@@ -119,8 +122,13 @@ def consumer_func(id: str):
     print(f"consumer {id} started")
     while True:
         print(f"consumer {id} ready to get next data")
-        c: Customer = global_queue.pop()
-        work(id, c)
+        try:
+            c: Customer = global_queue.pop(1)
+            work(id, c)
+        except TimeoutError:
+            print("no data in queue. timeout.")
+            if not in_working_hours:
+                break
 
 
 def work(id, customer):
