@@ -4,7 +4,7 @@ import threading
 import time
 from threading import Thread
 import random
-
+import heapq
 
 def producer(id: str):
     print(f"producer {id} started")
@@ -28,7 +28,7 @@ def consumer(id: str):
     while True:
         print(f"consumer {id} ready to get next data")
         # call pop
-        x = example.poppri()
+        x = example.pop()
         work(id, x.number, x.type)
 
 
@@ -48,52 +48,45 @@ class Customer:
 
 class SimpleQueue:
     def __init__(self):
-        self.priority = []
-        self.t = []
+        self.t = heapq
         self.lock = threading.Lock()
         self.event = threading.Event()
 
     def push(self, content):
         with self.lock:
             print(f"producer {id} appending {content.number} into list")
-            self.t.append(content)
-            self.priority.append(content.number)
+            heapq.heappush(self.t, content)
             self.event.set()
 
-    def count(self):
+    """def count(self):
         with self.lock:
             return self.__count()
 
     def __count(self):
-        return len(self.t)
+        return len(self.t)"""
 
     def pop(self):
         while True:
             self.event.wait()
             with self.lock:
-                if self.__count() > 0:
-                    x = self.t[0]
-                    del self.t[0]
-                    remaining = len(self.t)
-                    if remaining <= 0:
-                        self.event.clear()
-                    print(x)
-                    return x
+                return heapq.heappop(self.t)
 
-    def poppri(self):
+    """def poppri(self):
         while True:
             self.event.wait()
             with self.lock:
                 if self.__count() > 0:
                     # the least num shows the highest priority
                     fir = min(self.priority)
-                    x = self.t[fir]
-                    del self.t[fir]
+                    i = self.t.index(Customer.number == fir)
+                    x = self.t[i]
+                    del self.t[i]
+                    # self.t.remove(fir)
                     remaining = len(self.t)
                     if remaining <= 0:
                         self.event.clear()
                     print(x)
-                    return x
+                    return x"""
 
 
 if __name__ == '__main__':

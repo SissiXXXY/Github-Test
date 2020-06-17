@@ -1,15 +1,21 @@
-class Producer0:
-    n = 1
+import heapq
 
-    def get_next(self):
-        Producer0.n += 1
-        return Producer0.n
+class PQ:
+    def push(self, n):
+        ...
+
+    def pop(self):
+        ...
+
+    def count(self):
+        ...
 
 
-if __name__ == '__main__':
-    a = Producer0()
-    b = Producer0()
-    print(a.get_next())
-    print(b.get_next())
-    print(a.get_next())
-    print(b.get_next())
+def test_0():
+    q = PQ()
+    q.push(1)
+    q.push(3)
+    q.push(2)
+    ret = [q.pop(), q.pop(), q.pop()]
+    assert ret == [1, 2, 3]
+
