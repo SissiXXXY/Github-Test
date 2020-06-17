@@ -2,39 +2,10 @@
 import string
 import threading
 import time
+from datetime import datetime
 from threading import Thread
 import random
 import heapq
-
-def producer(id: str):
-    print(f"producer {id} started")
-    while True:
-        produce()
-        # time.sleep(random.random())
-
-
-def produce():
-    localtime = time.localtime(time.time())
-    ran_str = ''.join(random.sample(string.ascii_letters, 4))
-    while True:
-        num = random.randint(1, 10000)
-        common = Customer(num, ran_str, 'common', localtime)
-        example.push(common)
-        time.sleep(random.random())
-
-
-def consumer(id: str):
-    print(f"consumer {id} started")
-    while True:
-        print(f"consumer {id} ready to get next data")
-        # call pop
-        x = example.pop()
-        work(id, x.number, x.type)
-
-
-def work(id, customer, type):
-    print(f"consumer {id} now serving customer number: {customer}, type: {type}")
-    time.sleep(random.random() * 3)
 
 
 class Customer:
@@ -45,16 +16,55 @@ class Customer:
         self.arrival_time = arrival_time
         self.lock = threading.Lock()
 
+    def __lt__(self, other):
+        if isinstance(other, Customer):
+            if self.number < other.number:
+                return True
+            elif self.number == other.number:
+                return self.name < other.name
+            else:
+                return False
+        else:
+            raise NotImplementedError()
+
+    def __gt__(self, other):
+        if isinstance(other, Customer):
+            if self.number > other.number:
+                return True
+            elif self.number == other.number:
+                return self.name > other.name
+            else:
+                return False
+        else:
+            raise NotImplementedError()
+
+    def __eq__(self, other):
+        if isinstance(other, Customer):
+            return self.number == other.number and self.name == other.name
+        else:
+            raise NotImplementedError()
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __ge__(self, other):
+        return self > other or self == other
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __str__(self):
+        return f"[{self.number}]{self.name} {self.type} {self.arrival_time}"
+
 
 class SimpleQueue:
     def __init__(self):
-        self.t = heapq
+        self.t = []
         self.lock = threading.Lock()
         self.event = threading.Event()
 
     def push(self, content):
         with self.lock:
-            print(f"producer {id} appending {content.number} into list")
             heapq.heappush(self.t, content)
             self.event.set()
 
@@ -67,9 +77,10 @@ class SimpleQueue:
 
     def pop(self):
         while True:
-            self.event.wait()
+            self.event.wait(1)
             with self.lock:
-                return heapq.heappop(self.t)
+                if len(self.t) > 0:
+                    return heapq.heappop(self.t)
 
     """def poppri(self):
         while True:
@@ -89,16 +100,56 @@ class SimpleQueue:
                     return x"""
 
 
+def producer_func(id: str):
+    print(f"producer {id} started")
+    for i in range(10):
+        c: Customer = produce()
+        print(f"producer {id} appending {c} into list")
+        global_queue.push(c)
+        time.sleep(random.random())
+
+
+def produce():
+    num = random.randint(1, 10000)
+    ran_str = ''.join(random.sample(string.ascii_letters, 4))
+    return Customer(num, ran_str, 'common', datetime.now())
+
+
+def consumer_func(id: str):
+    print(f"consumer {id} started")
+    while True:
+        print(f"consumer {id} ready to get next data")
+        c: Customer = global_queue.pop()
+        work(id, c)
+
+
+def work(id, customer):
+    print(f"consumer {id} now serving customer: {customer}")
+    time.sleep(random.random() * 3)
+
+
 if __name__ == '__main__':
-    example = SimpleQueue()
+    global_queue = SimpleQueue()
+    in_working_hours = True
+
     # start consumers
     for i in range(2):
-        consumer_thread = Thread(target=consumer, args=(f"C{i + 1}",))
+        consumer_thread = Thread(target=consumer_func, args=(f"C{i + 1}",))
         consumer_thread.start()
         """consumer_thread.join()"""
 
     # start producers
     for i in range(3):
-        producer_thread = Thread(target=producer, args=(f"P{i + 1}",))
+        producer_thread = Thread(target=producer_func, args=(f"P{i + 1}",))
         producer_thread.start()
         """producer_thread.join()"""
+
+    while True:
+        cmd = input()
+        if cmd == "exit":
+            print("==================exit====================")
+            print("******* do something to exit *************")
+            in_working_hours = False
+            break
+        else:
+            print(f"=================={cmd}====================")
