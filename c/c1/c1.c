@@ -2,6 +2,8 @@
 #include <math.h>
 #include <time.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct
 {
@@ -15,7 +17,14 @@ int list_init(list_t* plist, int capacity)
     plist->pdata = (int*)malloc(sizeof(int) * capacity);
     plist->capacity = capacity;
     plist->size = 0;
-    printf("successfully create a list");
+    if (plist->pdata == NULL) {
+        printf("failed to create a list\n");
+        return 0;
+    }
+    else {
+        printf("successfully create a list\n");
+        return plist->pdata != NULL;
+    }
 }
 
 void list_destroy(list_t* plist)
@@ -27,6 +36,17 @@ int list_append(list_t* plist, int val)
 {
     if (plist->size == plist->capacity) {
         ensure_capacity(plist);
+        int new_size = 2 * plist->size;
+        void* pnewdata = realloc(plist->pdata, new_size);
+        if (pnewdata == NULL) {
+            printf("running out of space\n");
+            return -1;
+        }
+        else {
+            plist->pdata = pnewdata;
+            plist->pdata[plist->size] = val;
+            plist->size++;
+        }
     }
     else {
         plist->pdata[plist->size] = val;
@@ -35,12 +55,6 @@ int list_append(list_t* plist, int val)
     return 0;
 }
 
-int ensure_capacity(list_t* plist) 
-{
-    if (plist->size >= plist->capacity) {
-        ()
-    }
-}
 int is_prime(list_t* plist, int num)
 {
     const int threshold = (int)sqrt(num);
