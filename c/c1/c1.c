@@ -12,17 +12,35 @@ typedef struct
 
 int list_init(list_t* plist, int capacity)
 {
+    plist->pdata = (int*)malloc(sizeof(int) * capacity);
+    plist->capacity = capacity;
+    plist->size = 0;
+    printf("successfully create a list");
 }
 
-int list_destroy(list_t* plist)
+void list_destroy(list_t* plist)
 {
-    
+    free(plist->pdata);
 }
 
 int list_append(list_t* plist, int val)
 {
+    if (plist->size == plist->capacity) {
+        ensure_capacity(plist);
+    }
+    else {
+        plist->pdata[plist->size] = val;
+        plist->size++;
+    }
+    return 0;
 }
 
+int ensure_capacity(list_t* plist) 
+{
+    if (plist->size >= plist->capacity) {
+        ()
+    }
+}
 int is_prime(list_t* plist, int num)
 {
     const int threshold = (int)sqrt(num);
