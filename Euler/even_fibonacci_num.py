@@ -11,5 +11,5 @@ while True:
         fibo_list.append(_next)
     else:
         break
-
+print(fibo_list)
 print(sum([x for x in fibo_list if x % 2 == 0]))
