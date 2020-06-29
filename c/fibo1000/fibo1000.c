@@ -47,11 +47,14 @@ int list_append(list_t* plist, int val)
 	plist->size++;
 	return 0;
 }
+void list_set(list_t* plist, int index)
+{
 
+}
 list_t* list_add(list_t* plist1, list_t* plist2)
 {
 	list_t next;
-	list_t pnext = &next;
+	list_t* pnext = &next;
 	if (list_init(pnext, 50000) == 0)
 	{
 		printf("next init failed\n");
@@ -75,13 +78,13 @@ list_t* list_add(list_t* plist1, list_t* plist2)
 	
 	
 	int i = 0;
-	while true
+	while (1)
 	{
 		if (i > plist1->size) 
 		{//break when out of range
 			break;
 		}
-		int s=plist1[i] + plist2[i];
+		int s = plist1[i] + plist2[i];
 		if (carry = 1) 
 		{//has carry
 			s += 1;//add carry
@@ -92,7 +95,7 @@ list_t* list_add(list_t* plist1, list_t* plist2)
 			carry = 1;
 			s = s - 10;
 		}
-		list_append(, s);//store backwards
+		list_append(pnext, s);//store backwards
 		i++;
 	}
 	if (carry > 0) 
@@ -106,10 +109,12 @@ list_t* list_add(list_t* plist1, list_t* plist2)
 
 int main(void)
 {
-	list_t fibo;//store all the pointers referring to the elements in fibo
-	list_t* pfibo = &fibo;
+	list_t* fibo[1000];//store all the pointers referring to the elements in fibo
+	list_t* (*pfibo)[1000] = fibo[1000];//the pointer of the whole array
 	list_t first;//store the former value
+	list_t* pfirst = &first;
 	list_t second;//store the latter value
+	list_t* psecond = &second;
 	if (list_init(&first, 50000) == 0)
 	{
 		printf("first init failed\n");
@@ -128,14 +133,21 @@ int main(void)
 		return -1;
 	}
 	const clock_t start = clock();
-	for (...)
+	list_append(pfirst, 1);
+	list_append(psecond, 2);
+	pfibo[0] = pfirst;
+	pfibo[1] = 2;
+	for (int i =2;i<1000;i++)
 	{
-		list_append(pfibo, pnext)
+		pfibo[i] = list_add(pfibo[i - 2],  pfibo[i - 1]);
+	}
+	for (int i = 0; i < pfibo[1000]; i++) {
+		printf("%d", pfibo[i]);
 	}
 	const clock_t end = clock();
 	printf("%.3f seconds", (end - start) / (double)CLOCKS_PER_SEC);
 
-	list_destroy(&primeList);
+	list_destroy(pfibo);
 
 	return 0;
 }
