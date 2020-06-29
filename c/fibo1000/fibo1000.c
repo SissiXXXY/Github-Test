@@ -14,7 +14,7 @@ typedef struct
 
 int list_init(list_t* plist, int capacity)
 {
-	plist->pdata = (int*)malloc(sizeof(int) * capacity);
+	plist->pdata = (char*)malloc(sizeof(plist->pdata[0]) * capacity);
 	plist->capacity = capacity;
 	plist->size = 0;
 	return plist->pdata != NULL;
@@ -47,21 +47,21 @@ int list_append(list_t* plist, int val)
 	plist->size++;
 	return 0;
 }
-void list_print(list_t* plist) 
+
+void list_print(list_t* plist)
 {
-	for (int i=0;i<plist->size;i++)
-	{
-		printf("%c", plist->pdata[i]);
+	for (int i = plist->size-1; i >= 0; i--)
+	{	
+		if (i == plist ->size - 1 && plist->pdata[i] == 0) {
+			continue;
+		}
+		printf("%d", plist->pdata[i]);
 	}
+	printf("\n");
 }
+
 int list_add(list_t* plist1, list_t* plist2, list_t* pnext)
 {
-	if (list_init(pnext, 50000) == 0)
-	{
-		printf("next init failed\n");
-		return -1;
-	}
-
 	int carry = 0;
 
 	int diff = plist1->size - plist2->size;
@@ -72,7 +72,7 @@ int list_add(list_t* plist1, list_t* plist2, list_t* pnext)
 		}
 	}
 	if (diff < 0) {
-		for (int i = 0; i < diff; i++) {
+		for (int i = 0; i < -diff; i++) {
 			list_append(plist1, 0);
 		}
 	}
@@ -81,7 +81,7 @@ int list_add(list_t* plist1, list_t* plist2, list_t* pnext)
 	int i = 0;
 	while (1)
 	{
-		if (i > plist1->size)
+		if (i >= plist1->size)//0 base
 		{//break when out of range
 			break;
 		}
@@ -132,10 +132,10 @@ int main(void)
 
 	for (int i = 2; i < 1000; i++)
 	{
-		list_init(pfibo + i, 5000);
+		list_init(pfibo + i, 50000);
 		list_add(pfibo + i - 2, pfibo + i - 1, pfibo + i);
 	}
-	for (int i = 0; i < 1000; i++) 
+	for (int i = 0; i < 1000; i++)
 	{
 		list_print(pfibo + i);
 		//printf("%d", pfibo[i]);
@@ -143,7 +143,7 @@ int main(void)
 	const clock_t end = clock();
 	printf("%.3f seconds", (end - start) / (double)CLOCKS_PER_SEC);
 
-	for (int i = 0; i < 1000; i++) 
+	for (int i = 0; i < 1000; i++)
 	{
 		list_destroy(pfibo + i);
 	}
