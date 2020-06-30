@@ -18,5 +18,8 @@
     <ClCompile Include="fibo1000.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="function_ptr_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

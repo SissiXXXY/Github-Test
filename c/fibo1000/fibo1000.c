@@ -109,7 +109,7 @@ int list_add(list_t* plist1, list_t* plist2, list_t* pnext)
 }
 
 
-int main(void)
+int main_0(void)
 {
 #define CNT 2000
 
