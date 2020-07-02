@@ -37,7 +37,7 @@ ShapeVtbl const Shape_vtbl =
 {
     &Shape_move,
     &Shape_area,
-    &Shape_show,
+    &Shape_show
 };
 
 void Shape_init(Shape* const me, double x, double y)
@@ -66,13 +66,17 @@ void Circle_move(Circle* const me, double deltax, double deltay)
 {
     me->super.x += deltax;
     me->super.y += deltay;
+}
 
+Circle_show(Circle const* const me)
+{
     printf("circle current position: x: %f, y: %f, radius: %f", me->super.x, me->super.y, me->r);
 }
 
 ShapeVtbl const Circle_vtbl = {
     &Circle_move,
-    &Circle_area
+    &Circle_area, 
+    &Circle_show
 };
 
 void Circle_init(Circle* const me, double x, double y, double r)
@@ -102,12 +106,18 @@ void Rectangle_move(Rectangle* const me, double deltax, double deltay)
 {
     me->super.x += deltax;
     me->super.y += deltay;
+    
+}
+
+Rectangle_show(Rectangle const* const me)
+{
     printf("circle current position: x: %f, y: %f, width: %f, height: %f", me->super.x, me->super.y, me->w, me->h);
 }
 
 ShapeVtbl const Rect_vtbl = {
     &Rectangle_move,
-    &Rectangle_area
+    &Rectangle_area,
+    &Rectangle_show
 };
 
 void Rectangle_init(Rectangle* const me, double x, double y, double w, double h)
@@ -134,6 +144,8 @@ double move_shape(Shape* const me, double deltax, double deltay)
 
 void show_shape(Shape* const me)
 {
+    ShapeVtbl* pvtable = (ShapeVtbl*)me->vptr;
+    (*pvtable->show)(me);
 }
 
 int main(void)
