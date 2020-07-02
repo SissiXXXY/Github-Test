@@ -12,7 +12,7 @@ typedef struct
 
 typedef struct
 {
-    double (*move)(Shape* const me, double dx, double dy);
+    void (*move)(Shape* const me, double dx, double dy);
     double (*area)(Shape const* const me);
     void (*show)(Shape const* const me);
 } ShapeVtbl;
@@ -68,9 +68,9 @@ void Circle_move(Circle* const me, double deltax, double deltay)
     me->super.y += deltay;
 }
 
-Circle_show(Circle const* const me)
+void Circle_show(Circle const* const me)
 {
-    printf("circle current position: x: %f, y: %f, radius: %f", me->super.x, me->super.y, me->r);
+    printf("circle current position: x: %f, y: %f, radius: %f\n", me->super.x, me->super.y, me->r);
 }
 
 ShapeVtbl const Circle_vtbl = {
@@ -109,9 +109,9 @@ void Rectangle_move(Rectangle* const me, double deltax, double deltay)
     
 }
 
-Rectangle_show(Rectangle const* const me)
+void Rectangle_show(Rectangle const* const me)
 {
-    printf("circle current position: x: %f, y: %f, width: %f, height: %f", me->super.x, me->super.y, me->w, me->h);
+    printf("circle current position: x: %f, y: %f, width: %f, height: %f\n", me->super.x, me->super.y, me->w, me->h);
 }
 
 ShapeVtbl const Rect_vtbl = {
@@ -136,10 +136,10 @@ double calc_area(Shape const* const me)
     return (*pvtable->area)(me);
 }
 
-double move_shape(Shape* const me, double deltax, double deltay)
+void move_shape(Shape* const me, double deltax, double deltay)
 {
     ShapeVtbl* pvtable = (ShapeVtbl*)me->vptr;
-    return (*pvtable->move)(me, deltax, deltay);
+    (*pvtable->move)(me, deltax, deltay);
 }
 
 void show_shape(Shape* const me)
@@ -168,7 +168,6 @@ int main(void)
 
     pshape = (Shape*)&rect;
     printf("%lf\n", calc_area(pshape));
-    printf("before move: ");
     printf("before move: ");
     show_shape(pshape);
     move_shape(pshape, 5.0, 5.0);
