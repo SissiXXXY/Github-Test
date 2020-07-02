@@ -10,7 +10,8 @@ typedef struct
 } Shape;
 
 typedef struct
-{
+{	
+	double (*move)(Shape* const me);
 	double (*area)(Shape const* const me);
 }ShapeVtbl;
 
@@ -19,9 +20,15 @@ double Shape_area(Shape const* const me) {
 	return 0;
 }
 
+void Shape_move(Shape* const me, double deltax, double deltay) {
+	//assert(0);
+}
+
+
 ShapeVtbl const Shape_vtbl =
 {
-	&Shape_area
+	&Shape_move,
+	&Shape_area 
 };
 
 void Shape_init(Shape* const me, double x, double y)
@@ -43,7 +50,15 @@ double cir_area(Circle const* const me) {
 	return a;
 }
 
+void cir_move(Circle* const me, double deltax, double deltay) {
+	me->super.x += deltax;
+	me->super.y += deltay;
+
+	printf("circle current position: x: %f, y: %f, radius: %f", me->super.x, me->super.y, me->r);
+}
+
 ShapeVtbl const Circle_vtbl = {
+	&cir_move, 
    &cir_area
 };
 
@@ -67,7 +82,15 @@ double rect_area(Rectangle const* const me)
 	return a;
 }
 
+void rect_move(Rectangle* const me,double deltax,double deltay)
+{
+	me->super.x += deltax;
+	me->super.y += deltay;
+	printf("circle current position: x: %f, y: %f, width: %f, height: %f", me->super.x, me->super.y, me->w, me->h);
+}
+
 ShapeVtbl const Rect_vtbl = {
+	&rect_move, 
    &rect_area
 };
 
@@ -85,6 +108,13 @@ double calc_area(Shape const* const me)
 	return (*pvtable->area)(me);
 }
 
+double after_move(Shape *const me, double deltax, double deltay)
+{
+	ShapeVtbl* pvtable = (ShapeVtbl*)me->vptr;
+	return (*pvtable->move)(me);
+}
+
+
 int main(void)
 {
 	printf("function pointer test\n");
@@ -96,9 +126,11 @@ int main(void)
 
 	Shape* pshape = (Shape*)&circle;
 	printf("%lf\n", calc_area(pshape));
+	after_move(pshape, 3.5, 3.5);
 
 	pshape = (Shape*)&rect;
 	printf("%lf\n", calc_area(pshape));
-
+	after_move(pshape, 5.0, 5.0);
+	
 	return 0;
 }
