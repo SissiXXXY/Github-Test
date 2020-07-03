@@ -258,3 +258,4 @@ output.html
 
 # dask
 *.lock
+*.exe
