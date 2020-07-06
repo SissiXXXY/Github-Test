@@ -12,6 +12,7 @@ INCLUDELIB OLDNAMES
 PUBLIC	___local_stdio_printf_options
 PUBLIC	__vfprintf_l
 PUBLIC	_printf
+PUBLIC	_f0
 PUBLIC	_f1
 PUBLIC	_f2
 PUBLIC	_main
@@ -21,33 +22,45 @@ _DATA	SEGMENT
 COMM	?_OptionsStorage@?1??__local_stdio_printf_options@@9@9:QWORD							; `__local_stdio_printf_options'::`2'::_OptionsStorage
 _DATA	ENDS
 _DATA	SEGMENT
-$SG9165	DB	'call f1(a,10) -> %d', 0aH, 00H
-	ORG $+3
-$SG9166	DB	'call f1(b,1000) --> %d', 0aH, 00H
+$SG9171	DB	'call f1(a,10) --> %d', 0aH, 00H
+	ORG $+2
+$SG9172	DB	'call f1(b,1000) --> %d', 0aH, 00H
 _DATA	ENDS
 ; Function compile flags: /Odtp
 ; File D:\src\Github-Test\c\asm_demo\simple.c
 _TEXT	SEGMENT
+_main_v1$ = -4						; size = 4
 _main	PROC
 
-; 25   : {
+; 27   : {
 
 	push	ebp
 	mov	ebp, esp
+	push	ecx
 
-; 26   :     f2(123, 456);
+; 28   :     int main_v1 = f0(1234, 5678);
+
+	push	5678					; 0000162eH
+	push	1234					; 000004d2H
+	call	_f0
+	add	esp, 8
+	mov	DWORD PTR _main_v1$[ebp], eax
+
+; 29   :     f2(main_v1, 456);
 
 	push	456					; 000001c8H
-	push	123					; 0000007bH
+	mov	eax, DWORD PTR _main_v1$[ebp]
+	push	eax
 	call	_f2
 	add	esp, 8
 
-; 27   :     return 0;
+; 30   :     return 0;
 
 	xor	eax, eax
 
-; 28   : }
+; 31   : }
 
+	mov	esp, ebp
 	pop	ebp
 	ret	0
 _main	ENDP
@@ -61,16 +74,13 @@ _a$ = 8							; size = 4
 _b$ = 12						; size = 4
 _f2	PROC
 
-; 13   : {
+; 18   : {
 
 	push	ebp
 	mov	ebp, esp
 	sub	esp, 8
 
-; 14   :     int f2_x;
-; 15   :     int f2_y;
-; 16   : 
-; 17   :     f2_x = f1(a, 10);
+; 19   :     int f2_x = f1(a, 10);
 
 	push	10					; 0000000aH
 	mov	eax, DWORD PTR _a$[ebp]
@@ -79,16 +89,16 @@ _f2	PROC
 	add	esp, 8
 	mov	DWORD PTR _f2_x$[ebp], eax
 
-; 18   :     printf("call f1(a,10) -> %d\n", f2_x);
+; 20   :     printf("call f1(a,10) --> %d\n", f2_x);
 
 	mov	ecx, DWORD PTR _f2_x$[ebp]
 	push	ecx
-	push	OFFSET $SG9165
+	push	OFFSET $SG9171
 	call	_printf
 	add	esp, 8
 
-; 19   : 
-; 20   :     f2_y = f1(b, 1000);
+; 21   : 
+; 22   :     int f2_y = f1(b, 1000);
 
 	push	1000					; 000003e8H
 	mov	edx, DWORD PTR _b$[ebp]
@@ -97,15 +107,15 @@ _f2	PROC
 	add	esp, 8
 	mov	DWORD PTR _f2_y$[ebp], eax
 
-; 21   :     printf("call f1(b,1000) --> %d\n", f2_y);
+; 23   :     printf("call f1(b,1000) --> %d\n", f2_y);
 
 	mov	eax, DWORD PTR _f2_y$[ebp]
 	push	eax
-	push	OFFSET $SG9166
+	push	OFFSET $SG9172
 	call	_printf
 	add	esp, 8
 
-; 22   : }
+; 24   : }
 
 	mov	esp, ebp
 	pop	ebp
@@ -120,22 +130,22 @@ _a$ = 8							; size = 4
 _n$ = 12						; size = 4
 _f1	PROC
 
-; 4    : {
+; 9    : {
 
 	push	ebp
 	mov	ebp, esp
 	push	ecx
 
-; 5    :     int f1_x = 1;
+; 10   :     int f1_x = 1;
 
 	mov	DWORD PTR _f1_x$[ebp], 1
 
-; 6    :     if (a > 0)
+; 11   :     if (a > 0)
 
 	cmp	DWORD PTR _a$[ebp], 0
 	jle	SHORT $LN2@f1
 
-; 7    :         return f1_x + a + n;
+; 12   :         return f1_x + a + n;
 
 	mov	eax, DWORD PTR _f1_x$[ebp]
 	add	eax, DWORD PTR _a$[ebp]
@@ -144,20 +154,43 @@ _f1	PROC
 	jmp	SHORT $LN1@f1
 $LN2@f1:
 
-; 8    :     else
-; 9    :         return f1_x - a - n;
+; 13   :     else
+; 14   :         return f1_x - a - n;
 
 	mov	eax, DWORD PTR _f1_x$[ebp]
 	sub	eax, DWORD PTR _a$[ebp]
 	sub	eax, DWORD PTR _n$[ebp]
 $LN1@f1:
 
-; 10   : }
+; 15   : }
 
 	mov	esp, ebp
 	pop	ebp
 	ret	0
 _f1	ENDP
+_TEXT	ENDS
+; Function compile flags: /Odtp
+; File D:\src\Github-Test\c\asm_demo\simple.c
+_TEXT	SEGMENT
+_a$ = 8							; size = 4
+_b$ = 12						; size = 4
+_f0	PROC
+
+; 4    : {
+
+	push	ebp
+	mov	ebp, esp
+
+; 5    :     return a + b;
+
+	mov	eax, DWORD PTR _a$[ebp]
+	add	eax, DWORD PTR _b$[ebp]
+
+; 6    : }
+
+	pop	ebp
+	ret	0
+_f0	ENDP
 _TEXT	ENDS
 ; Function compile flags: /Odtp
 ; File C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt\stdio.h
