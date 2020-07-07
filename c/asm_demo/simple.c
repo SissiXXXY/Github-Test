@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int f0(int a, int b)
 {
@@ -26,6 +27,13 @@ void f2(int a, int b)
 int main()
 {
     int main_v1 = f0(1234, 5678);
+	
+	int* p1 = (int*)malloc(4*16);
+	int* p2 = (int*)malloc(4*32);
+	p1[10] = 111;
+	p2[20] = 222;
+	*p1 = f0(*(p1+10), p2[20]);
+	
     f2(main_v1, 456);
     return 0;
 }

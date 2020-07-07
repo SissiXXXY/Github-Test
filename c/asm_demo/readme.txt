@@ -1,6 +1,6 @@
 在 Developer Command Prompt for VS 2019 里面运行命令行
 
-		cl /FAs simple.c
+		cl /FAsc /Fasimple.asm simple.c
 		
 online文档：
 https://www.ruanyifeng.com/blog/2018/01/assembly-language-primer.html

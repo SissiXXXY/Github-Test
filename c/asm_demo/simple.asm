@@ -18,51 +18,101 @@ PUBLIC	_f2
 PUBLIC	_main
 EXTRN	___acrt_iob_func:PROC
 EXTRN	___stdio_common_vfprintf:PROC
+EXTRN	_malloc:PROC
 _DATA	SEGMENT
 COMM	?_OptionsStorage@?1??__local_stdio_printf_options@@9@9:QWORD							; `__local_stdio_printf_options'::`2'::_OptionsStorage
 _DATA	ENDS
 _DATA	SEGMENT
-$SG9171	DB	'call f1(a,10) --> %d', 0aH, 00H
+$SG10687 DB	'call f1(a,10) --> %d', 0aH, 00H
 	ORG $+2
-$SG9172	DB	'call f1(b,1000) --> %d', 0aH, 00H
+$SG10688 DB	'call f1(b,1000) --> %d', 0aH, 00H
 _DATA	ENDS
 ; Function compile flags: /Odtp
 ; File D:\src\Github-Test\c\asm_demo\simple.c
 _TEXT	SEGMENT
-_main_v1$ = -4						; size = 4
+_main_v1$ = -12						; size = 4
+_p2$ = -8						; size = 4
+_p1$ = -4						; size = 4
 _main	PROC
 
-; 27   : {
+; 28   : {
 
-	push	ebp
-	mov	ebp, esp
-	push	ecx
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
+  00003	83 ec 0c	 sub	 esp, 12			; 0000000cH
 
-; 28   :     int main_v1 = f0(1234, 5678);
+; 29   :     int main_v1 = f0(1234, 5678);
 
-	push	5678					; 0000162eH
-	push	1234					; 000004d2H
-	call	_f0
-	add	esp, 8
-	mov	DWORD PTR _main_v1$[ebp], eax
+  00006	68 2e 16 00 00	 push	 5678			; 0000162eH
+  0000b	68 d2 04 00 00	 push	 1234			; 000004d2H
+  00010	e8 00 00 00 00	 call	 _f0
+  00015	83 c4 08	 add	 esp, 8
+  00018	89 45 f4	 mov	 DWORD PTR _main_v1$[ebp], eax
 
-; 29   :     f2(main_v1, 456);
+; 30   : 	
+; 31   : 	int* p1 = (int*)malloc(4*16);
 
-	push	456					; 000001c8H
-	mov	eax, DWORD PTR _main_v1$[ebp]
-	push	eax
-	call	_f2
-	add	esp, 8
+  0001b	6a 40		 push	 64			; 00000040H
+  0001d	e8 00 00 00 00	 call	 _malloc
+  00022	83 c4 04	 add	 esp, 4
+  00025	89 45 fc	 mov	 DWORD PTR _p1$[ebp], eax
 
-; 30   :     return 0;
+; 32   : 	int* p2 = (int*)malloc(4*32);
 
-	xor	eax, eax
+  00028	68 80 00 00 00	 push	 128			; 00000080H
+  0002d	e8 00 00 00 00	 call	 _malloc
+  00032	83 c4 04	 add	 esp, 4
+  00035	89 45 f8	 mov	 DWORD PTR _p2$[ebp], eax
 
-; 31   : }
+; 33   : 	p1[10] = 111;
 
-	mov	esp, ebp
-	pop	ebp
-	ret	0
+  00038	b8 04 00 00 00	 mov	 eax, 4
+  0003d	6b c8 0a	 imul	 ecx, eax, 10
+  00040	8b 55 fc	 mov	 edx, DWORD PTR _p1$[ebp]
+  00043	c7 04 0a 6f 00
+	00 00		 mov	 DWORD PTR [edx+ecx], 111 ; 0000006fH
+
+; 34   : 	p2[20] = 222;
+
+  0004a	b8 04 00 00 00	 mov	 eax, 4
+  0004f	6b c8 14	 imul	 ecx, eax, 20
+  00052	8b 55 f8	 mov	 edx, DWORD PTR _p2$[ebp]
+  00055	c7 04 0a de 00
+	00 00		 mov	 DWORD PTR [edx+ecx], 222 ; 000000deH
+
+; 35   : 	*p1 = f0(*(p1+10), p2[20]);
+
+  0005c	b8 04 00 00 00	 mov	 eax, 4
+  00061	6b c8 14	 imul	 ecx, eax, 20
+  00064	8b 55 f8	 mov	 edx, DWORD PTR _p2$[ebp]
+  00067	8b 04 0a	 mov	 eax, DWORD PTR [edx+ecx]
+  0006a	50		 push	 eax
+  0006b	8b 4d fc	 mov	 ecx, DWORD PTR _p1$[ebp]
+  0006e	8b 51 28	 mov	 edx, DWORD PTR [ecx+40]
+  00071	52		 push	 edx
+  00072	e8 00 00 00 00	 call	 _f0
+  00077	83 c4 08	 add	 esp, 8
+  0007a	8b 4d fc	 mov	 ecx, DWORD PTR _p1$[ebp]
+  0007d	89 01		 mov	 DWORD PTR [ecx], eax
+
+; 36   : 	
+; 37   :     f2(main_v1, 456);
+
+  0007f	68 c8 01 00 00	 push	 456			; 000001c8H
+  00084	8b 55 f4	 mov	 edx, DWORD PTR _main_v1$[ebp]
+  00087	52		 push	 edx
+  00088	e8 00 00 00 00	 call	 _f2
+  0008d	83 c4 08	 add	 esp, 8
+
+; 38   :     return 0;
+
+  00090	33 c0		 xor	 eax, eax
+
+; 39   : }
+
+  00092	8b e5		 mov	 esp, ebp
+  00094	5d		 pop	 ebp
+  00095	c3		 ret	 0
 _main	ENDP
 _TEXT	ENDS
 ; Function compile flags: /Odtp
@@ -74,52 +124,52 @@ _a$ = 8							; size = 4
 _b$ = 12						; size = 4
 _f2	PROC
 
-; 18   : {
+; 19   : {
 
-	push	ebp
-	mov	ebp, esp
-	sub	esp, 8
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
+  00003	83 ec 08	 sub	 esp, 8
 
-; 19   :     int f2_x = f1(a, 10);
+; 20   :     int f2_x = f1(a, 10);
 
-	push	10					; 0000000aH
-	mov	eax, DWORD PTR _a$[ebp]
-	push	eax
-	call	_f1
-	add	esp, 8
-	mov	DWORD PTR _f2_x$[ebp], eax
+  00006	6a 0a		 push	 10			; 0000000aH
+  00008	8b 45 08	 mov	 eax, DWORD PTR _a$[ebp]
+  0000b	50		 push	 eax
+  0000c	e8 00 00 00 00	 call	 _f1
+  00011	83 c4 08	 add	 esp, 8
+  00014	89 45 fc	 mov	 DWORD PTR _f2_x$[ebp], eax
 
-; 20   :     printf("call f1(a,10) --> %d\n", f2_x);
+; 21   :     printf("call f1(a,10) --> %d\n", f2_x);
 
-	mov	ecx, DWORD PTR _f2_x$[ebp]
-	push	ecx
-	push	OFFSET $SG9171
-	call	_printf
-	add	esp, 8
+  00017	8b 4d fc	 mov	 ecx, DWORD PTR _f2_x$[ebp]
+  0001a	51		 push	 ecx
+  0001b	68 00 00 00 00	 push	 OFFSET $SG10687
+  00020	e8 00 00 00 00	 call	 _printf
+  00025	83 c4 08	 add	 esp, 8
 
-; 21   : 
-; 22   :     int f2_y = f1(b, 1000);
+; 22   : 
+; 23   :     int f2_y = f1(b, 1000);
 
-	push	1000					; 000003e8H
-	mov	edx, DWORD PTR _b$[ebp]
-	push	edx
-	call	_f1
-	add	esp, 8
-	mov	DWORD PTR _f2_y$[ebp], eax
+  00028	68 e8 03 00 00	 push	 1000			; 000003e8H
+  0002d	8b 55 0c	 mov	 edx, DWORD PTR _b$[ebp]
+  00030	52		 push	 edx
+  00031	e8 00 00 00 00	 call	 _f1
+  00036	83 c4 08	 add	 esp, 8
+  00039	89 45 f8	 mov	 DWORD PTR _f2_y$[ebp], eax
 
-; 23   :     printf("call f1(b,1000) --> %d\n", f2_y);
+; 24   :     printf("call f1(b,1000) --> %d\n", f2_y);
 
-	mov	eax, DWORD PTR _f2_y$[ebp]
-	push	eax
-	push	OFFSET $SG9172
-	call	_printf
-	add	esp, 8
+  0003c	8b 45 f8	 mov	 eax, DWORD PTR _f2_y$[ebp]
+  0003f	50		 push	 eax
+  00040	68 00 00 00 00	 push	 OFFSET $SG10688
+  00045	e8 00 00 00 00	 call	 _printf
+  0004a	83 c4 08	 add	 esp, 8
 
-; 24   : }
+; 25   : }
 
-	mov	esp, ebp
-	pop	ebp
-	ret	0
+  0004d	8b e5		 mov	 esp, ebp
+  0004f	5d		 pop	 ebp
+  00050	c3		 ret	 0
 _f2	ENDP
 _TEXT	ENDS
 ; Function compile flags: /Odtp
@@ -130,43 +180,44 @@ _a$ = 8							; size = 4
 _n$ = 12						; size = 4
 _f1	PROC
 
-; 9    : {
+; 10   : {
 
-	push	ebp
-	mov	ebp, esp
-	push	ecx
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
+  00003	51		 push	 ecx
 
-; 10   :     int f1_x = 1;
+; 11   :     int f1_x = 1;
 
-	mov	DWORD PTR _f1_x$[ebp], 1
+  00004	c7 45 fc 01 00
+	00 00		 mov	 DWORD PTR _f1_x$[ebp], 1
 
-; 11   :     if (a > 0)
+; 12   :     if (a > 0)
 
-	cmp	DWORD PTR _a$[ebp], 0
-	jle	SHORT $LN2@f1
+  0000b	83 7d 08 00	 cmp	 DWORD PTR _a$[ebp], 0
+  0000f	7e 0d		 jle	 SHORT $LN2@f1
 
-; 12   :         return f1_x + a + n;
+; 13   :         return f1_x + a + n;
 
-	mov	eax, DWORD PTR _f1_x$[ebp]
-	add	eax, DWORD PTR _a$[ebp]
-	add	eax, DWORD PTR _n$[ebp]
-	jmp	SHORT $LN1@f1
-	jmp	SHORT $LN1@f1
+  00011	8b 45 fc	 mov	 eax, DWORD PTR _f1_x$[ebp]
+  00014	03 45 08	 add	 eax, DWORD PTR _a$[ebp]
+  00017	03 45 0c	 add	 eax, DWORD PTR _n$[ebp]
+  0001a	eb 0b		 jmp	 SHORT $LN1@f1
+  0001c	eb 09		 jmp	 SHORT $LN1@f1
 $LN2@f1:
 
-; 13   :     else
-; 14   :         return f1_x - a - n;
+; 14   :     else
+; 15   :         return f1_x - a - n;
 
-	mov	eax, DWORD PTR _f1_x$[ebp]
-	sub	eax, DWORD PTR _a$[ebp]
-	sub	eax, DWORD PTR _n$[ebp]
+  0001e	8b 45 fc	 mov	 eax, DWORD PTR _f1_x$[ebp]
+  00021	2b 45 08	 sub	 eax, DWORD PTR _a$[ebp]
+  00024	2b 45 0c	 sub	 eax, DWORD PTR _n$[ebp]
 $LN1@f1:
 
-; 15   : }
+; 16   : }
 
-	mov	esp, ebp
-	pop	ebp
-	ret	0
+  00027	8b e5		 mov	 esp, ebp
+  00029	5d		 pop	 ebp
+  0002a	c3		 ret	 0
 _f1	ENDP
 _TEXT	ENDS
 ; Function compile flags: /Odtp
@@ -176,20 +227,20 @@ _a$ = 8							; size = 4
 _b$ = 12						; size = 4
 _f0	PROC
 
-; 4    : {
+; 5    : {
 
-	push	ebp
-	mov	ebp, esp
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
 
-; 5    :     return a + b;
+; 6    :     return a + b;
 
-	mov	eax, DWORD PTR _a$[ebp]
-	add	eax, DWORD PTR _b$[ebp]
+  00003	8b 45 08	 mov	 eax, DWORD PTR _a$[ebp]
+  00006	03 45 0c	 add	 eax, DWORD PTR _b$[ebp]
 
-; 6    : }
+; 7    : }
 
-	pop	ebp
-	ret	0
+  00009	5d		 pop	 ebp
+  0000a	c3		 ret	 0
 _f0	ENDP
 _TEXT	ENDS
 ; Function compile flags: /Odtp
@@ -203,45 +254,46 @@ _printf	PROC						; COMDAT
 
 ; 956  :     {
 
-	push	ebp
-	mov	ebp, esp
-	sub	esp, 8
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
+  00003	83 ec 08	 sub	 esp, 8
 
 ; 957  :         int _Result;
 ; 958  :         va_list _ArgList;
 ; 959  :         __crt_va_start(_ArgList, _Format);
 
-	lea	eax, DWORD PTR __Format$[ebp+4]
-	mov	DWORD PTR __ArgList$[ebp], eax
+  00006	8d 45 0c	 lea	 eax, DWORD PTR __Format$[ebp+4]
+  00009	89 45 fc	 mov	 DWORD PTR __ArgList$[ebp], eax
 
 ; 960  :         _Result = _vfprintf_l(stdout, _Format, NULL, _ArgList);
 
-	mov	ecx, DWORD PTR __ArgList$[ebp]
-	push	ecx
-	push	0
-	mov	edx, DWORD PTR __Format$[ebp]
-	push	edx
-	push	1
-	call	___acrt_iob_func
-	add	esp, 4
-	push	eax
-	call	__vfprintf_l
-	add	esp, 16					; 00000010H
-	mov	DWORD PTR __Result$[ebp], eax
+  0000c	8b 4d fc	 mov	 ecx, DWORD PTR __ArgList$[ebp]
+  0000f	51		 push	 ecx
+  00010	6a 00		 push	 0
+  00012	8b 55 08	 mov	 edx, DWORD PTR __Format$[ebp]
+  00015	52		 push	 edx
+  00016	6a 01		 push	 1
+  00018	e8 00 00 00 00	 call	 ___acrt_iob_func
+  0001d	83 c4 04	 add	 esp, 4
+  00020	50		 push	 eax
+  00021	e8 00 00 00 00	 call	 __vfprintf_l
+  00026	83 c4 10	 add	 esp, 16			; 00000010H
+  00029	89 45 f8	 mov	 DWORD PTR __Result$[ebp], eax
 
 ; 961  :         __crt_va_end(_ArgList);
 
-	mov	DWORD PTR __ArgList$[ebp], 0
+  0002c	c7 45 fc 00 00
+	00 00		 mov	 DWORD PTR __ArgList$[ebp], 0
 
 ; 962  :         return _Result;
 
-	mov	eax, DWORD PTR __Result$[ebp]
+  00033	8b 45 f8	 mov	 eax, DWORD PTR __Result$[ebp]
 
 ; 963  :     }
 
-	mov	esp, ebp
-	pop	ebp
-	ret	0
+  00036	8b e5		 mov	 esp, ebp
+  00038	5d		 pop	 ebp
+  00039	c3		 ret	 0
 _printf	ENDP
 _TEXT	ENDS
 ; Function compile flags: /Odtp
@@ -256,31 +308,31 @@ __vfprintf_l PROC					; COMDAT
 
 ; 644  :     {
 
-	push	ebp
-	mov	ebp, esp
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
 
 ; 645  :         return __stdio_common_vfprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, _Stream, _Format, _Locale, _ArgList);
 
-	mov	eax, DWORD PTR __ArgList$[ebp]
-	push	eax
-	mov	ecx, DWORD PTR __Locale$[ebp]
-	push	ecx
-	mov	edx, DWORD PTR __Format$[ebp]
-	push	edx
-	mov	eax, DWORD PTR __Stream$[ebp]
-	push	eax
-	call	___local_stdio_printf_options
-	mov	ecx, DWORD PTR [eax+4]
-	push	ecx
-	mov	edx, DWORD PTR [eax]
-	push	edx
-	call	___stdio_common_vfprintf
-	add	esp, 24					; 00000018H
+  00003	8b 45 14	 mov	 eax, DWORD PTR __ArgList$[ebp]
+  00006	50		 push	 eax
+  00007	8b 4d 10	 mov	 ecx, DWORD PTR __Locale$[ebp]
+  0000a	51		 push	 ecx
+  0000b	8b 55 0c	 mov	 edx, DWORD PTR __Format$[ebp]
+  0000e	52		 push	 edx
+  0000f	8b 45 08	 mov	 eax, DWORD PTR __Stream$[ebp]
+  00012	50		 push	 eax
+  00013	e8 00 00 00 00	 call	 ___local_stdio_printf_options
+  00018	8b 48 04	 mov	 ecx, DWORD PTR [eax+4]
+  0001b	51		 push	 ecx
+  0001c	8b 10		 mov	 edx, DWORD PTR [eax]
+  0001e	52		 push	 edx
+  0001f	e8 00 00 00 00	 call	 ___stdio_common_vfprintf
+  00024	83 c4 18	 add	 esp, 24			; 00000018H
 
 ; 646  :     }
 
-	pop	ebp
-	ret	0
+  00027	5d		 pop	 ebp
+  00028	c3		 ret	 0
 __vfprintf_l ENDP
 _TEXT	ENDS
 ; Function compile flags: /Odtp
@@ -291,18 +343,18 @@ ___local_stdio_printf_options PROC			; COMDAT
 
 ; 90   :     {
 
-	push	ebp
-	mov	ebp, esp
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
 
 ; 91   :         static unsigned __int64 _OptionsStorage;
 ; 92   :         return &_OptionsStorage;
 
-	mov	eax, OFFSET ?_OptionsStorage@?1??__local_stdio_printf_options@@9@9 ; `__local_stdio_printf_options'::`2'::_OptionsStorage
+  00003	b8 00 00 00 00	 mov	 eax, OFFSET ?_OptionsStorage@?1??__local_stdio_printf_options@@9@9 ; `__local_stdio_printf_options'::`2'::_OptionsStorage
 
 ; 93   :     }
 
-	pop	ebp
-	ret	0
+  00008	5d		 pop	 ebp
+  00009	c3		 ret	 0
 ___local_stdio_printf_options ENDP
 _TEXT	ENDS
 END
