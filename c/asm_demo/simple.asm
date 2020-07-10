@@ -55,7 +55,7 @@ _main	PROC
   0001b	6a 40		 push	 64			; 00000040H
   0001d	e8 00 00 00 00	 call	 _malloc
   00022	83 c4 04	 add	 esp, 4
-  00025	89 45 fc	 mov	 DWORD PTR _p1$[ebp], eax
+  00025	89 45 fc	 mov	 DWORD PTR [_p1$+ebp], eax
 
 ; 32   : 	int* p2 = (int*)malloc(4*32);
 
@@ -84,16 +84,16 @@ _main	PROC
 
   0005c	b8 04 00 00 00	 mov	 eax, 4
   00061	6b c8 14	 imul	 ecx, eax, 20
-  00064	8b 55 f8	 mov	 edx, DWORD PTR _p2$[ebp]
-  00067	8b 04 0a	 mov	 eax, DWORD PTR [edx+ecx]
+  00064	8b 55 f8	 mov	 edx, DWORD PTR _p2$[ebp]     	edx=p2
+  00067	8b 04 0a	 mov	 eax, DWORD PTR [edx+ecx]	eax=*(p2+80)
   0006a	50		 push	 eax
   0006b	8b 4d fc	 mov	 ecx, DWORD PTR _p1$[ebp]
   0006e	8b 51 28	 mov	 edx, DWORD PTR [ecx+40]
   00071	52		 push	 edx
   00072	e8 00 00 00 00	 call	 _f0
   00077	83 c4 08	 add	 esp, 8
-  0007a	8b 4d fc	 mov	 ecx, DWORD PTR _p1$[ebp]
-  0007d	89 01		 mov	 DWORD PTR [ecx], eax
+  0007a	8b 4d fc	 mov	 ecx, DWORD PTR _p1$[ebp]	ecx = p1
+  0007d	89 01		 mov	 DWORD PTR [ecx], eax		*p1 = eax
 
 ; 36   : 	
 ; 37   :     f2(main_v1, 456);
