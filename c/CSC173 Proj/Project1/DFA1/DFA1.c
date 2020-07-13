@@ -22,13 +22,15 @@ void main() {
 	if (strcmp(typein, "exit") == 0) {
 		return;
 	}
-	if (DFA1(typein) == FALSE) {
+	else if (DFA1(typein) == FALSE) {
 		printf("The input %s result: FALSE", typein);
 	}
-	else {
+	else if (DFA1(typein) == TRUE) {
 		printf("The input %s result: TRUE", typein);
 	}
-	
+	else {
+		printf("FAILED");
+	}
 
 }
 
