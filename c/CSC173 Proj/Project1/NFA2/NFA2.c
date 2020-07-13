@@ -2,7 +2,7 @@
 #include<string.h>
 
 
-int NFA2(char* in, char* target) {
+int NFA2(char* in) {
 	int current_status = 0; //0: none; 1: c; 2: co; 3: cod; 4:code;
 	char c = 'c';
 	char o = 'o';
@@ -50,10 +50,10 @@ void main() {
 	if (strcmp(typein, "exit") == 0) {
 		return;
 	}
-	else if (NFA2(typein,"code") == 1) {
+	else if (NFA2(typein) == 1) {
 		printf("The input %s result: TRUE", typein);
 	}
-	else if (NFA2(typein, "code") == 0) {
+	else if (NFA2(typein) == 0) {
 		printf("The input %s result: FALSE", typein);
 	}
 	else {
