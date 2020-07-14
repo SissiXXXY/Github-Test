@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+
 #define TRUE 1
 #define FALSE 0
 
@@ -12,15 +13,7 @@ typedef struct
     int next_status;
 } DFA_Row;
 
-DFA_Row DFA3_table[] = {
-    {0, '0', -1, 1}, //
-    {0, '1', -1, 0},
-    {0, '\0', 1, 2},
-    {1, '0', -1, 0},
-    {1, '1', -1, 1},
-    {1, '\0', 0, 2}
-
-};
+#define DFA_CNT(tbl) (sizeof(tbl) / sizeof(DFA_Row))
 
 int transit(const DFA_Row* const dfa_tbl, const int dfa_row_cnt,
             const int current_status, const char input,
@@ -28,7 +21,7 @@ int transit(const DFA_Row* const dfa_tbl, const int dfa_row_cnt,
 {
     for (int i = 0; i < dfa_row_cnt; i++)
     {
-        DFA_Row* row = &DFA3_table[i];
+        const DFA_Row* row = &dfa_tbl[i];
         if (current_status == row->current_status && input == row->input)
         {
             //get the output and next status
@@ -43,10 +36,8 @@ int transit(const DFA_Row* const dfa_tbl, const int dfa_row_cnt,
     return FALSE; //failed to get identical row
 }
 
-void main()
+void run_dfa(const DFA_Row* const dfa_tbl, const int row_cnt, const char* input_string)
 {
-    const char* input_string = "10101010001110101010101";
-    const int row_count = sizeof(DFA3_table) / sizeof(DFA_Row);
     int current = 0;
     int nextsta = 0;
     int output = 0;
@@ -54,7 +45,7 @@ void main()
     char* input_char_ptr = (char*)input_string;
     while (1)
     {
-        const int ret = transit(DFA3_table, row_count, current, *input_char_ptr, &output, &nextsta);
+        const int ret = transit(dfa_tbl, row_cnt, current, *input_char_ptr, &output, &nextsta);
         if (ret == FALSE)
         {
             printf("failed, unexpected internal error\n");
@@ -76,4 +67,29 @@ void main()
         input_char_ptr++;
         current = nextsta;
     }
+}
+
+DFA_Row DFA1_table[] = {
+    {0, '0', -1, 1},
+};
+
+DFA_Row DFA2_table[] = {
+    {0, '0', -1, 1},
+};
+
+DFA_Row DFA3_table[] = {
+    {0, '0', -1, 1}, //
+    {0, '1', -1, 0},
+    {0, '\0', 1, 2},
+    {1, '0', -1, 0},
+    {1, '1', -1, 1},
+    {1, '\0', 0, 2}
+
+};
+
+void main()
+{
+    run_dfa(DFA1_table, DFA_CNT(DFA1_table), "input string for dfa1");
+    run_dfa(DFA2_table, DFA_CNT(DFA2_table), "input string for dfa2");
+    run_dfa(DFA3_table, DFA_CNT(DFA3_table), "10101010001110101010101");
 }
