@@ -9,6 +9,7 @@ typedef struct
 {
     int current_status; //0: start, even 0s,  1: odd 0s,  2: final
     char input;
+    int except; //1: true, this input is accepted; 0: false, this input is not allowed
     int output; // -1: void,  0: false,  1: true
     int next_status;
 } DFA_Row;
@@ -16,9 +17,10 @@ typedef struct
 #define DFA_CNT(tbl) (sizeof(tbl) / sizeof(DFA_Row))
 
 int transit(const DFA_Row* const dfa_tbl, const int dfa_row_cnt,
-            const int current_status, const char input,
+            const int current_status, const char input, char except_set[], 
             int* const output, int* const next_status)
 {
+    int except = except_test(except_set, input);//read in letter by letter, put it inside loop
     for (int i = 0; i < dfa_row_cnt; i++)
     {
         const DFA_Row* row = &dfa_tbl[i];
@@ -45,10 +47,11 @@ void run_dfa(const DFA_Row* const dfa_tbl, const int row_cnt, const char* input_
     char* input_char_ptr = (char*)input_string;
     while (1)
     {
-        const int ret = transit(dfa_tbl, row_cnt, current, *input_char_ptr, &output, &nextsta);
+        const int ret = transit(dfa_tbl, row_cnt, current, *input_char_ptr, &output, &nextsta);//except
         if (ret == FALSE)
         {
-            printf("failed, unexpected internal error\n");
+            printf("Failed\n");
+           // printf("failed, unexpected internal error\n");
             return;
         }
 
@@ -69,13 +72,34 @@ void run_dfa(const DFA_Row* const dfa_tbl, const int row_cnt, const char* input_
     }
 }
 
+int except_test(char excset[], char test ) {
+    for (int i = 0; i < (sizeof(excset) / sizeof(char)); i++) {
+        if (test == excset[i]) {
+            return 1; //set contains the char
+        }
+    }
+    return 0;
+    
+}
+
 DFA_Row DFA1_table[] = {
-    {0, '0', -1, 1},
+    /*{0, true, 1, 1},
+    {0, false, 0, 0}*/
+
+    {0, 'c', -1, 1}, 
+    {1, 's', -1, 2},
+    {2, 'c', -1, 3},
+    {3, '1',a,  -1, 4},
+    {4, '7', -1, 5},
+    {5, '3', 1, 6}
 };
+char DFA1_set[] = { 'c', 's', '1', '7', '3' };
 
 DFA_Row DFA2_table[] = {
-    {0, '0', -1, 1},
+    {0, true, 1, 1},
+    {0, false, 0, 0}
 };
+char DFA2_set[] = { 'c', 'a', 't' };
 
 DFA_Row DFA3_table[] = {
     {0, '0', -1, 1}, //
@@ -86,6 +110,7 @@ DFA_Row DFA3_table[] = {
     {1, '\0', 0, 2}
 
 };
+char DFA3_set[] = { '0', '1', '\0' };
 
 void main()
 {

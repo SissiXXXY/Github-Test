@@ -2,6 +2,35 @@
 #include<string.h>
 
 
+typedef struct
+{
+	int current_status; //0: start, even 0s,  1: odd 0s,  2: final
+	int check_result;
+	//int (*funcptr)(char);
+	//char input;
+	int output; // -1: void,  0: false,  1: true
+	int next_status;
+} DFA_Row;
+
+DFA_Row DFA3_table[] = {
+	{0, '0', -1, 1}, //
+	{0, '1', -1, 0},
+	{0, '\0', 1, 2},
+	{1, '0', -1, 0},
+	{1, '1', -1, 1},
+	{1, '\0', 0, 2}
+
+};
+
+int check(char in, char except) {
+	if (in == except) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
 int NFA2(char* in) {
 	int current_status = 0; //0: none; 1: c; 2: co; 3: cod; 4:code;
 	char c = 'c';
