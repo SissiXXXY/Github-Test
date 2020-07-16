@@ -1,4 +1,4 @@
-#import re
+# import re
 
 
 def transit(tbl, currentsta, inp):
@@ -86,7 +86,7 @@ DFA2_table = {
 DFA3_table = {
     0: [('0', -1, 1),
         ('1', -1, 0),
-        ('\0',1,-1),
+        ('\0', 1, -1),
         (None, 0, -1)],
     1: [('0', -1, 0),
         ('1', -1, 1),
