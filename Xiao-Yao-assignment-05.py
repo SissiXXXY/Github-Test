@@ -11,7 +11,7 @@ myListNameSingular = "my favorite soft-drink"
 myListNamePlural = "my favorite soft-drinks"
 
 # Print the output for part A
-print("Part A")
+print("Part A") 
 print("------")
 a_str = "My collection contains {}"
 print(a_str.format(myListNamePlural))
