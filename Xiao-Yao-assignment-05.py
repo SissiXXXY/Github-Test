@@ -11,10 +11,9 @@ myListNameSingular = "my favorite soft-drink"
 myListNamePlural = "my favorite soft-drinks"
 
 # Print the output for part A
-print("Part A") 
+print("Part A")
 print("------")
-a_str = "My collection contains {}"
-print(a_str.format(myListNamePlural))
+print(f"My collection contains {myListNamePlural}")
 
 # Part B
 # Print a blank line to separate from part A
@@ -26,8 +25,7 @@ numItems = len(myList)
 # Print the output for part B
 print("Part B")
 print("------")
-b_str = "My collection contains {} {} items."
-print(b_str.format(numItems, myListNameSingular))
+print(f"My collection contains {numItems} {myListNameSingular} items.")
 
 # Part C
 # Print a blank line to separate from part B
@@ -47,9 +45,8 @@ print("------")
 # Use a while loop to iterate over the list
 i = 0
 while i < numItems:
-    d_str = "\t{}. {}"
-    print(d_str.format(i + 1, myList[i]))
-    i = i + 1
+    print(f"\t{i + 1}. {myList[i]}")
+    i += 1
 
 # Part E
 # Print a blank line to separate from part D
@@ -65,26 +62,22 @@ myList.remove(secondItemToBeRemoved)
 
 print("Part E")
 print("------")
-e_str1 = "The first {} removed was '{}'."
-e_str2 = "The second {} removed was '{}'."
-print(e_str1.format(myListNameSingular, firstItemToBeRemoved))
-print(e_str2.format(myListNameSingular, secondItemToBeRemoved))
+print(f"The first {myListNameSingular} removed was '{firstItemToBeRemoved}'.")
+print(f"The second {myListNameSingular} removed was '{secondItemToBeRemoved}'.")
 
 # Store a new item for the collection
 itemToBeInserted = "Fanta"
 
 # Use the insert method to insert the new item into the second position
 myList.insert(1, itemToBeInserted)
-e_str3 = "The {} inserted was '{}'."
-print(e_str3.format(myListNameSingular, itemToBeInserted))
+print(f"The {myListNameSingular} inserted was '{itemToBeInserted}'.")
 
 # Use len to count total item numbers and overwrite the numItems
 numItems = len(myList)
 
 # Use pop to remove the last item and store it in itemPopped
 itemPopped = myList.pop()
-e_str4 = "The {} popped off was '{}'."
-print(e_str4.format(myListNameSingular, itemPopped))
+print(f"The {myListNameSingular} popped off was '{itemPopped}'.")
 print("")
 
 # Copy the same loop code from Part C
@@ -123,7 +116,7 @@ while (True):
     lottoNumber = lottoNumbers[f_counter]
     lottoOutput = lottoOutput + str(lottoNumber) + " "
     f_counter += 1
-    if (f_counter == len(lottoNumbers)):
+    if f_counter == len(lottoNumbers):
         break
 
 # Add the Mega ball to lottoOutput
@@ -145,8 +138,7 @@ numTickets = r.randint(1, 10)
 # Print the output
 print("Part G")
 print("------")
-g_str = "My {} Python Lottery Tickets:"
-print(g_str.format(numTickets))
+print(f"My {numTickets} Python Lottery Tickets:")
 print("")
 # Same algorithm with 5,6
 
@@ -177,18 +169,18 @@ for i in range(numTickets):
         # Use a condition to check the number of iterations and break when exceed the number of items in lottoNumbers
         # Use if statement to judge whether to add a 0
         lottoNumber = lottoNumbers[f_counter]
-        if (lottoNumber < 10):
+        if lottoNumber < 10:
             lottoOutput = lottoOutput + "0" + str(lottoNumber) + " "
         else:
             lottoOutput = lottoOutput + str(lottoNumber) + " "
 
         f_counter += 1
-        if (f_counter == len(lottoNumbers)):
+        if f_counter == len(lottoNumbers):
             break
 
     # Add the Mega ball to lottoOutput and use if statement to judge whether to add a 0
-    if(megaBallNumber<10):
-        lottoOutput = lottoOutput + "Mega Ball: " + "0"+str(megaBallNumber)
+    if megaBallNumber < 10:
+        lottoOutput = lottoOutput + "Mega Ball: " + "0" + str(megaBallNumber)
     else:
         lottoOutput = lottoOutput + "Mega Ball: " + str(megaBallNumber)
     print(lottoOutput)
